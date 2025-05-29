@@ -1,0 +1,90 @@
+<!-- templates/product.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ product['title'] }} - Product Page</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="container">
+        <a
+          style="text-decoration: none"
+          class="back-button"
+          href="{{ url_for('index') }}"
+          >&larr; Back to Products</a
+        >
+      </div>
+      <div class="product-card">
+        <div class="product-image">
+          <img
+            id="main-image"
+            src="{{ product['images'][0] }}"
+            alt="{{ product['title'] }}"
+          />
+          <div class="thumbnail-container">
+            <div class="thumbnails">
+              {% for img in product['images'] %}
+              <img class="thumbnail" src="{{ img }}" alt="Thumbnail" />
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="product-details">
+          <h2>{{ product['title'] }}</h2>
+          <p class="price">${{ product['price'] }}</p>
+          <p>{{ product['description'] }}</p>
+          <label for="variant-select">Choose a variant:</label>
+          <select id="variant-select">
+            {% for variant in product['variants'] %}
+            <option value="{{ variant }}">{{ variant }}</option>
+            {% endfor %}
+          </select>
+          <button class="add-to-cart" data-product-id="{{ product_id }}">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {% if cart_items %} {% set ns = namespace(total = 0) %} {% set
+    ns.num_of_items = 0 %} {% for item in cart_items %} {% set ns.num_of_items =
+    ns.num_of_items + 1 %} {% endfor %}
+    <div class="cart">
+      <h2 id="your-cart">Your Cart ({{ ns.num_of_items }}) 🛒</h2>
+      {% for item in cart_items %}
+      <div class="cart-item">
+        <strong> {{ item.title }}</strong> — {{ item.variant }} x{{
+        item.quantity }} — ${{ '%.2f'|format(item.price | float) }}
+
+        <form method="POST" action="/remove-from-cart" style="display: inline">
+          <input type="hidden" name="index" value="{{ item.index }}" />
+          <button
+            type="submit"
+            style="background: none; border: none; cursor: pointer"
+          >
+            🗑️
+          </button>
+        </form>
+      </div>
+
+      {% set ns.total = ns.total + item.price %} {% endfor %}
+
+      <div class="cart-item">
+        <strong> Total </strong> — ${{ '%.2f'|format(ns.total | float) }}
+      </div>
+
+      <form action="{{ url_for('clear_cart') }}" method="post">
+        <button type="submit" class="clear-cart">Clear Cart 🗑️</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

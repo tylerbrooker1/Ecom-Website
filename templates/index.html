@@ -1,0 +1,81 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lamp Store</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+     
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome to the Lamp Store</h1>
+      <div class="product-grid">
+        {% for key, product in products.items() %}
+        <div class="product-card">
+          <a href="{{ url_for('product_page', product_id=key) }}">
+            <img
+              src="{{ product.images[0] }}"
+              alt="{{ product.title }}"
+              style="width: 100%; border-radius: 8px"
+            />
+          </a>
+
+          <h2>{{ product.title }}</h2>
+          <p class="price" ${{ '%.2f'|format(product.price) }}</p>
+            <label for="variant-select">Choose a variant:</label>
+            <select id="variant-select">
+              {% for variant in product['variants'] %}
+              <option value="{{ variant }}">{{ variant }}</option>
+              {% endfor %}
+            </select>
+            <button class="add-to-cart" data-product-id="{{ key }}">Add to Cart</button>
+
+        </div>
+        {% endfor %}
+      </div>
+      
+      
+      {% if cart_items %}
+      {% set ns = namespace(total = 0) %}
+      {% set ns.num_of_items = 0 %}
+      {% for item in cart_items %}
+        {% set ns.num_of_items = ns.num_of_items + 1 %}
+      {% endfor %}
+      <div class="cart">
+        <h2 id="your-cart">Your Cart ({{ ns.num_of_items }}) 🛒</h2>
+        {% for item in cart_items %}
+        <div class="cart-item">
+          <strong>{{ item.title }}</strong> — {{ item.variant }} x{{
+          item.quantity }} — ${{ '%.2f'|format(item.price | float) }}
+          <form method="POST" action="/remove-from-cart" style="display:inline;">
+          <input type="hidden" name="index" value="{{ item.index }}">
+          <button type="submit" style="background:none;border:none;cursor:pointer;">
+            🗑️
+          </button>
+          </form>
+        </div>
+        {% set ns.total = ns.total + item.price %}
+        {% endfor %}
+      
+          <div class="cart-item">
+            <strong> Total </strong> — ${{ '%.2f'|format(ns.total | float) }}
+          </div>
+
+        <form action="{{ url_for('clear_cart') }}" method="post">
+          <button type="submit" class="clear-cart">Clear Cart 🗑️</button>
+        </form>
+      </div>
+      {% endif %}
+
+
+      
+    </div>
+
+   <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

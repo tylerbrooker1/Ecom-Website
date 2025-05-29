@@ -9,6 +9,7 @@ The main folder contains app.py, which runs the Flask server in Python, and two 
 static contains image files loaded and cached by the page in an image subfolder, and all the .css and .js files.
 template contains all html files to be rendered by the Flask engine.
 The app.py file needs to be run, and the IP address http://127.0.0.1:5000/ is normally used to test the web page.
+If you get an error with Flask, you may have to open you command prompt and install it by doing: 'pip install flask' and 'pip install flask_session'.
 
 
 Info on each relevant file:
